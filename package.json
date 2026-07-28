@@ -1,0 +1,14 @@
+{
+  "name": "sellbook",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "frontend:dev": "npm --prefix frontend run dev",
+    "admin:dev": "npm --prefix admin run dev",
+    "backend:start": "npm --prefix backend run start",
+    "dev": "concurrently \"npm run frontend:dev\" \"npm run admin:dev\" \"npm run backend:start\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}

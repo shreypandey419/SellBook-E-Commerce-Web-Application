@@ -30,4 +30,14 @@ export default [
       ],
     },
   },
+  {
+    files: [
+      'src/CartContext/CartContext.jsx',
+      'src/WishlistContext/WishlistContext.jsx',
+      'src/api/AuthContext.jsx',
+    ],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 ]

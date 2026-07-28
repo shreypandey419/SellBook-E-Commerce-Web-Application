@@ -1,151 +1,18 @@
-import { 
-  Search, ChevronDown, ChevronUp, Truck, CreditCard, DollarSign, 
-  CheckCircle, Clock, AlertCircle, BookOpen, User, MapPin, 
-  Mail, Phone, Edit, X, Package, RefreshCw 
-} from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { motion as Motion } from "framer-motion";
+import { FaCheck, FaFileDownload, FaTimes } from "react-icons/fa";
+import { toast } from "react-toastify";
+import apiClient from "../api/client";
 
-const statusOptions = [
-  {
-    value: "Pending",
-    label: "Pending",
-    icon: Clock,
-    color: "bg-yellow-100 text-yellow-800",
-    iconColor: "text-yellow-500",
-  },
-  {
-    value: "Processing",
-    label: "Processing",
-    icon: RefreshCw,
-    color: "bg-blue-100 text-blue-800",
-    iconColor: "text-blue-500",
-  },
-  {
-    value: "Shipped",
-    label: "Shipped",
-    icon: Truck,
-    color: "bg-indigo-100 text-indigo-800",
-    iconColor: "text-indigo-500",
-  },
-  {
-    value: "Delivered",
-    label: "Delivered",
-    icon: CheckCircle,
-    color: "bg-green-100 text-green-800",
-    iconColor: "text-green-500",
-  },
-  {
-    value: "Cancelled",
-    label: "Cancelled",
-    icon: AlertCircle,
-    color: "bg-red-100 text-red-800",
-    iconColor: "text-red-500",
-  },
-];
-
-  const [orders, setOrders] = useState([]);
-  const [counts, setCounts] = useState({ totalOrders: 0, pending: 0, processing: 0, shipped: 0, delivered: 0, cancelled: 0, pendingPayment: 0 });
-  const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState("all");
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
-  const [selectedOrder, setSelectedOrder] = useState(null);
-
-
-  const sortedOrders = useMemo(() => {
-    if (!sortConfig.key) return orders;
-    return [...orders].sort((a, b) => {
-      const aVal = sortConfig.key === "date" ? new Date(a[sortConfig.key]) : a[sortConfig.key];
-      const bVal = sortConfig.key === "date" ? new Date(b[sortConfig.key]) : b[sortConfig.key];
-      return sortConfig.direction === "asc" ? aVal > bVal ? 1 : -1 : aVal > bVal ? -1 : 1;
-    });
-  }, [orders, sortConfig]);
-
-    const StatusBadge = ({ status }) => {
-    const opt = statusOptions.find(o => o.value === status);
-    if (!opt) return null;
-    const Icon = opt.icon;
-    return (
-      <div className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${opt.color}`}>
-        <Icon className={`w-4 h-4 ${opt.iconColor}`} />
-        <span>{opt.label}</span>
-      </div>
-    );
-  };
-
-  const stats = [
-    { label: "Total Orders", value: counts.totalOrders, icon: Package, color: "bg-indigo-100", iconColor: "text-[#43C6AC]" },
-    { label: "Processing", value: counts.processing, icon: RefreshCw, color: "bg-blue-100", iconColor: "text-blue-600" },
-    { label: "Delivered", value: counts.delivered, icon: CheckCircle, color: "bg-green-100", iconColor: "text-green-600" },
-    { label: "Pending Payment", value: counts.pendingPayment, icon: CreditCard, color: "bg-purple-100", iconColor: "text-purple-600" }
-  ];
-
-
- <tbody className="divide-y divide-gray-200">
-                {sortedOrders.map(order => (
-                  <tr key={order._id} className={styles.tableRow}>
-                    <td className={`${styles.tableCell} ${styles.idCell}`}>{order.orderId}</td>
-                    <td className={`${styles.tableCell} ${styles.customerCell}`}>{order.shippingAddress.fullName}</td>
-                    <td className={`${styles.tableCell} ${styles.dateCell}`}>
-                      {new Date(order.placedAt).toLocaleDateString()}
-                    </td>
-                    <td className={`${styles.tableCell} ${styles.amountCell}`}>₹{order.finalAmount.toFixed(2)}</td>
-                    <td className={styles.tableCell}>
-                      <div className={styles.paymentBadge(order.paymentMethod === "Online Payment")}>
-                        {order.paymentMethod === "Online Payment" ? 
-                          <CreditCard className="w-4 h-4" /> : 
-                          <DollarSign className="w-4 h-4" />
-                        }
-                        <span>{order.paymentMethod === "Online Payment" ? "Online" : "COD"}</span>
-                      </div>
-                    </td>
-                    <td className={styles.tableCell}>
-                      <StatusBadge status={order.orderStatus} />
-                    </td>
-                    <td className={`${styles.tableCell} text-right`}>
-                      <button onClick={() => viewOrder(order._id)} className={styles.viewButton}>
-                        View
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-
-
-
-                    { label: "Online Payment", color: "bg-purple-500" },
-                  { label: "Cash on Delivery", color: "bg-orange-500" }
-
-
-
-                       { icon: User, label: "Customer", value: selectedOrder.shippingAddress.fullName },
-                    { icon: Mail, label: "Email", value: selectedOrder.shippingAddress.email },
-                    { icon: Phone, label: "Phone", value: selectedOrder.shippingAddress.phoneNumber },
-                    { 
-                      icon: MapPin, 
-                      label: "Address", 
-                      value: `${selectedOrder.shippingAddress.street}, ${selectedOrder.shippingAddress.city}, ${selectedOrder.shippingAddress.state} ${selectedOrder.shippingAddress.zipCode}` 
-                    }
-
-
-                                       { label: "Subtotal:", value: `₹${selectedOrder.totalAmount.toFixed(2)}` },
-                      { label: "Shipping:", value: `₹${selectedOrder.shippingCharge.toFixed(2)}` },
-                      { label: "Tax (5%):", value: `₹${selectedOrder.taxAmount.toFixed(2)}` },
-                      { label: "Total:", value: `₹${selectedOrder.finalAmount.toFixed(2)}`, isTotal: true }
-
-
-                         { 
-                      label: "Method:", 
-                      value: selectedOrder.paymentMethod,
-                      color: selectedOrder.paymentMethod === "Online Payment" ? 
-                        "bg-purple-100 text-purple-800" : "bg-orange-100 text-orange-800"
-                    },
-                    { 
-                      label: "Status:", 
-                      value: selectedOrder.paymentStatus,
-                      color: selectedOrder.paymentStatus === "Paid" ? 
-                        "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
-                    } 
-
-
-
-
-                    
+const statusStyles = { Pending: "bg-amber-100 text-amber-800", Confirmed: "bg-blue-100 text-blue-800", Processing: "bg-violet-100 text-violet-800", Delivered: "bg-emerald-100 text-emerald-800", Cancelled: "bg-rose-100 text-rose-800", Shipped: "bg-cyan-100 text-cyan-800" };
+const nextAction = { Pending: { status: "Confirmed", label: "Confirm" }, Confirmed: { status: "Processing", label: "Processing" }, Processing: { status: "Delivered", label: "Delivered" }, Shipped: { status: "Delivered", label: "Delivered" } };
+function StatusBadge({ status }) { const icon = status === "Delivered" ? <FaCheck /> : status === "Cancelled" ? <FaTimes /> : null; return <span className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold ${statusStyles[status] || "bg-slate-100 text-slate-700"}`}>{icon}{status}</span>; }
+function Orders() {
+  const [orders, setOrders] = useState([]); const [counts, setCounts] = useState({ totalOrders: 0, pending: 0, processing: 0, delivered: 0 }); const [loading, setLoading] = useState(true); const [updatingId, setUpdatingId] = useState("");
+  const fetchOrders = useCallback(async () => { try { const { data } = await apiClient.get("/api/orders"); if (!data.success) throw new Error("Unable to load orders."); setOrders(data.orders || []); setCounts(data.counts || {}); } catch (error) { toast.error(error.response?.data?.message || error.message); } finally { setLoading(false); } }, []);
+  useEffect(() => { fetchOrders(); }, [fetchOrders]);
+  const changeStatus = async (order, status) => { setUpdatingId(order._id); try { const { data } = await apiClient.patch(`/api/orders/${order._id}/status`, { status }); setOrders((items) => items.map((item) => item._id === data.order._id ? data.order : item)); toast.success(data.message); await fetchOrders(); } catch (error) { toast.error(error.response?.data?.message || "Unable to update order status."); } finally { setUpdatingId(""); } };
+  const downloadInvoice = async (order) => { try { const response = await apiClient.get(`/api/orders/${order._id}/invoice`, { responseType: "blob" }); const url = URL.createObjectURL(new Blob([response.data], { type: "application/pdf" })); const link = document.createElement("a"); link.href = url; link.download = `invoice-${order.orderId}.pdf`; link.click(); URL.revokeObjectURL(url); } catch { toast.error("Unable to download invoice."); } };
+  return <Motion.div initial={{ opacity: 0, y: 25 }} animate={{ opacity: 1, y: 0 }} className="p-6"><h1 className="mb-6 text-3xl font-bold">Orders</h1><div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">{[["Total Orders", counts.totalOrders, "bg-blue-600"], ["Pending", counts.pending, "bg-yellow-500"], ["Processing", counts.processing, "bg-indigo-600"], ["Delivered", counts.delivered, "bg-green-600"]].map(([label, value, color]) => <div key={label} className={`rounded-xl p-5 text-white ${color}`}><p>{label}</p><h2 className="text-3xl font-bold">{value || 0}</h2></div>)}</div>{loading ? <p className="text-center text-lg">Loading...</p> : orders.length === 0 ? <div className="rounded-xl bg-white p-10 text-center shadow"><h2 className="text-2xl font-semibold">No Orders Yet 📦</h2></div> : <div className="overflow-x-auto rounded-xl bg-white shadow"><table className="w-full"><thead className="bg-gray-100"><tr>{["Order ID", "Customer", "Amount", "Payment", "Status", "Actions"].map((title) => <th key={title} className="p-4 text-left">{title}</th>)}</tr></thead><tbody>{orders.map((order) => { const action = nextAction[order.orderStatus]; const canCancel = ["Pending", "Confirmed", "Processing", "Shipped"].includes(order.orderStatus); const busy = updatingId === order._id; return <tr key={order._id} className="border-t hover:bg-gray-50"><td className="p-4 font-medium">{order.orderId}</td><td className="p-4">{order.shippingAddress?.fullName || "—"}</td><td className="p-4">₹{Number(order.finalAmount || 0).toLocaleString("en-IN")}</td><td className="p-4">{order.paymentMethod}</td><td className="p-4"><StatusBadge status={order.orderStatus} /></td><td className="p-4"><div className="flex min-w-44 flex-wrap gap-2"><button type="button" onClick={() => downloadInvoice(order)} className="rounded-lg border border-slate-200 p-2 text-slate-600 hover:bg-slate-50" aria-label={`Download invoice for ${order.orderId}`}><FaFileDownload /></button>{action && <button type="button" disabled={busy} onClick={() => changeStatus(order, action.status)} className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-50">{busy ? "Updating…" : action.label}</button>}{canCancel && <button type="button" disabled={busy} onClick={() => changeStatus(order, "Cancelled")} className="rounded-lg border border-rose-200 px-3 py-1.5 text-sm font-semibold text-rose-700 disabled:opacity-50">Cancel</button>}</div></td></tr>; })}</tbody></table></div>}</Motion.div>;
+}
+export default Orders;

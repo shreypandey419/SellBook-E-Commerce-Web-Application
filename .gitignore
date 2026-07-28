@@ -1,0 +1,19 @@
+# Dependencies and generated builds
+node_modules/
+dist/
+coverage/
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# Local/editor files
+.DS_Store
+*.log
+.vscode/
+.idea/
+
+# Uploaded book covers are runtime data. Keep this directory locally, but do not commit uploads.
+backend/uploads/*
+!backend/uploads/.gitkeep

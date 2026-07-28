@@ -67,17 +67,6 @@ export const navbarStyles = {
   mobileCartBadge:
     "absolute top-0 right-0 -mt-1 -mr-1 w-5 h-5 flex items-center justify-center text-[10px] font-bold text-white bg-gradient-to-r from-amber-500 to-orange-600 rounded-full",
     
-      // Update these functions:
-  mobileNavIcon: (isActive, color) => {
-    const baseColor = color.includes('violet') ? 'violet' : color.split('-')[1];
-    return `h-5 w-5 ${isActive ? `text-${baseColor}-500` : "text-gray-600"}`;
-  },
-  
-  mobileNavText: (isActive, color) => {
-    const baseColor = color.includes('violet') ? 'violet' : color.split('-')[1];
-    return `ml-3 ${isActive ? `text-${baseColor}-600 font-medium` : "text-gray-600"}`;
-  },
-  
   // Add this new helper:
   getBaseColor: (color) => 
     color.includes('violet') ? 'violet' : color.split('-')[1],

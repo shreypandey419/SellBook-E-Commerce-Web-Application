@@ -1,0 +1,3 @@
+import { Link } from "react-router-dom";
+function OrderSuccessPage() { return <div className="mx-auto max-w-2xl py-20 text-center"><p className="text-6xl">🎉</p><h1 className="mt-5 text-4xl font-black">Order confirmed</h1><p className="mt-3 text-slate-600">Your order has been saved. You can track it from My Orders.</p><div className="mt-7 flex justify-center gap-3"><Link to="/orders" className="rounded-xl bg-slate-900 px-5 py-3 font-bold text-white">My Orders</Link><Link to="/" className="rounded-xl border px-5 py-3 font-bold">Continue shopping</Link></div></div>; }
+export default OrderSuccessPage;
