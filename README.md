@@ -1,3 +1,6 @@
+#id admin - admin@sellbook.com
+#password admin - admin123456
+
 # SellBook
 
 SellBook is a full-stack bookstore platform with a customer storefront, protected admin panel, inventory-aware ordering, reviews, coupons, invoices, analytics, and transactional email notifications.
